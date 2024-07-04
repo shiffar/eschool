@@ -36,6 +36,24 @@ COPY . /var/www
 # Copy existing application directory permissions
 COPY --chown=www-data:www-data . /var/www
 
+# Create a custom PHP-FPM configuration
+RUN { \
+    echo '[global]'; \
+    echo 'error_log = /proc/self/fd/2'; \
+    echo '[www]'; \
+    echo 'user = www-data'; \
+    echo 'group = www-data'; \
+    echo 'listen = 9000'; \
+    echo 'listen.owner = www-data'; \
+    echo 'listen.group = www-data'; \
+    echo 'pm = dynamic'; \
+    echo 'pm.max_children = 5'; \
+    echo 'pm.start_servers = 2'; \
+    echo 'pm.min_spare_servers = 1'; \
+    echo 'pm.max_spare_servers = 3'; \
+    echo 'chdir = /var/www'; \
+} > /usr/local/etc/php-fpm.d/www.conf
+
 # Change current user to www
 USER www-data
 
